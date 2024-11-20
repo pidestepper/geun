@@ -1,0 +1,62 @@
+local owners = {"antikurrr", "RichNikga", "Galaxy_Extendo"}
+local premium = {"Vxr_r", "AnonymousSanta_claus"}
+local ranks = {"[SCRIPT DEVELOPER]", "Script User", "Premium Script User"}
+
+local localPlayer = game.Players.LocalPlayer
+game:GetService("ReplicatedStorage"):WaitForChild("Skunked"):FireServer()
+
+local function updateRankTag(player, rank, color)
+    local head = player.Character:WaitForChild("Head")
+    local gui = head:WaitForChild("Gui")
+    local mainFrame = gui:WaitForChild("MainFrame")
+    local rankLabel = mainFrame:WaitForChild("Rank")
+
+    rankLabel.Visible = true
+    rankLabel.Text = rank
+    rankLabel.TextColor3 = color
+end
+
+local function handlePlayer(player)
+    if table.find(owners, player.Name) then
+        updateRankTag(player, ranks[1], Color3.fromRGB(196, 40, 28))
+        warn("A Developer of SL2.FUCKER Is In The Server: " .. player.Name)
+    end
+
+    if table.find(premium, player.Name) then
+        updateRankTag(player, ranks[3], Color3.fromRGB(249, 233, 153))
+    end
+    if player.Character and player.Character:FindFirstChild("Head") then
+        player.Character.Head.ChildAdded:Connect(function(child)
+            if player ~= localPlayer and child.Name == "Emote2" then
+                local textLabel = child:WaitForChild("TextLabel")
+                local nameLabel = player.Character.Head:WaitForChild("Gui"):WaitForChild("MainFrame"):WaitForChild("NameLabel")
+
+                if textLabel.Text == "[" .. nameLabel.Text .. "] [SHOUT] *ARE YOU SKUNKED ?!*" then
+                    updateRankTag(player, ranks[2], Color3.fromRGB(255, 0, 203))
+                end
+            end
+        end)
+    end
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player.Character and player.Character:FindFirstChild("Head") then
+        handlePlayer(player)
+    end
+    player.CharacterAdded:Connect(function()
+        handlePlayer(player)
+    end)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(nc)
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("Head") then
+                handlePlayer(player)
+            end
+            player.CharacterAdded:Connect(function()
+                handlePlayer(player)
+            end)
+        end
+    end)
+end)
